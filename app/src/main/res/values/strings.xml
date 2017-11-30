@@ -1,0 +1,29 @@
+<resources>
+    <string name="app_name">Nothing! Lab</string>
+
+    // main activity
+    <string name="elogin_button">Sign Up with Email</string>
+
+    <string name="welcome">Nothing! Lab</string>
+    <string name="unknown_response">Unknown response</string>
+    <string name="signin_failed">Failed to signin</string>
+    <string name="user_profile">Welcome to your profile page</string>
+    <string name="profile_title">User Profile</string>
+    <string name="user_name">SimonVN</string>
+    <string name="logout">LOGOUT</string>
+    <string name="delete_user">DELETE USER</string>
+    <string name="sign_out_error">Failed to sign out</string>
+    <string name="user_deletion_error">Failed to delete user</string>
+    <string name="glogin_button">Connect with Google</string>
+    <string name="title_activity_main">MainActivity</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_settings">Settings</string>
+
+    <string name="title_activity_about">AboutActivity</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+
+</resources>
