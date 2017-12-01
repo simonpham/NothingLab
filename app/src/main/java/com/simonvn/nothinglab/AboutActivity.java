@@ -1,18 +1,13 @@
 package com.simonvn.nothinglab;
 
-import android.app.ActionBar;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.text.Html;
-import android.text.SpannableString;
-import android.text.method.LinkMovementMethod;
+import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.view.Window;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class AboutActivity extends AppCompatActivity {
 

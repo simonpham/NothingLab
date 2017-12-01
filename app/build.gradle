@@ -32,12 +32,17 @@ android {
         applicationId "com.simonvn.nothinglab"
         minSdkVersion 21
         targetSdkVersion 26
-        versionCode 3
+        versionCode 4
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         signingConfig signingConfigs.config
     }
     buildTypes {
+        android.applicationVariants.all { variant ->
+            variant.outputs.all {
+                outputFileName = "${variant.name}-${variant.versionName}.apk"
+            }
+        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
@@ -65,11 +70,10 @@ dependencies {
     compile 'com.firebaseui:firebase-ui-auth:3.1.0'
     compile 'com.google.android.gms:play-services-auth:11.6.0'
     compile 'com.google.firebase:firebase-firestore:11.6.0'
-    //noinspection GradleDependency
     compile 'com.google.firebase:firebase-storage:11.6.0'
-
+    compile 'com.google.firebase:firebase-messaging:11.6.0'
+    compile 'com.firebase:firebase-jobdispatcher:0.6.0'
     compile 'de.hdodenhof:circleimageview:2.2.0'
-
 }
 
 apply plugin: 'com.google.gms.google-services'

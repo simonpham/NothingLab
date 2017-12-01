@@ -205,6 +205,10 @@ public class MainActivity extends AppCompatActivity
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            showSettings();
+            return true;
+        } else if (id == R.id.homeAsUp) {
+            onBackPressed();
             return true;
         }
 
@@ -495,7 +499,8 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void showSettings() {
-
+        Intent settings = new Intent(this, SettingsActivity.class);
+        startActivity(settings);
     }
 
     private void showAbout() {
