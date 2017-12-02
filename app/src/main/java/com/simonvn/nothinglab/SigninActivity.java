@@ -1,4 +1,4 @@
-package com.simonvn.nothinglab.activities.SigninActivity;
+package com.simonvn.nothinglab;
 
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
@@ -12,8 +12,6 @@ import android.widget.RelativeLayout;
 import com.firebase.ui.auth.AuthUI;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.simonvn.nothinglab.MainActivity;
-import com.simonvn.nothinglab.R;
 
 import java.util.Arrays;
 import java.util.List;
