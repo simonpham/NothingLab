@@ -2,7 +2,6 @@ package com.simonvn.nothinglab;
 
 import android.content.Intent;
 import android.content.res.Resources;
-import android.database.DataSetObserver;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
@@ -25,27 +24,21 @@ import android.text.method.KeyListener;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
-import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.firebase.ui.auth.AuthUI;
-import com.firebase.ui.database.FirebaseListAdapter;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -56,13 +49,11 @@ import com.google.firebase.storage.UploadTask;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -72,8 +63,6 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
 
-
-    private static final String TAG = MainActivity.class.getSimpleName();
     private TextView profileName;
     private TextView nickname;
     private CircleImageView imgAvatar;
@@ -118,14 +107,14 @@ public class MainActivity extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                EditText input = (EditText)findViewById(R.id.input);
+                final EditText input = (EditText)findViewById(R.id.input);
                 if (!Objects.equals(input.getText().toString().trim(), "")) {
 
                     // Read the input field and push a new instance
                     // of ChatMessage to the Firebase database
 
                     db.collection("messages")
-                            .add(new ChatMessage(input.getText().toString(), nickname.getText().toString()))
+                            .add(new ChatMessage(input.getText().toString(), nickname.getText().toString(), getUserUID()))
                             .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                                 @Override
                                 public void onSuccess(DocumentReference documentReference) {
@@ -139,13 +128,25 @@ public class MainActivity extends AppCompatActivity
                                 }
                             });
 
+                    // add new msg
+
+                    ChatMessage msg2 = new ChatMessage();
+
+                    msg2.setMessageUser(nickname.getText().toString());
+                    msg2.setMessageText(input.getText().toString());
+                    msg2.setMessageTime(new Date().getTime());
+                    msg2.setMessageUID(getUserUID());
+
+                    listOfMessages.add(msg2);
+                    adapter.notifyDataSetChanged();
+
                     // Clear the input
                     input.setText("");
                 }
             }
         });
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        final DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
@@ -170,8 +171,7 @@ public class MainActivity extends AppCompatActivity
         editName = (EditText)findViewById(R.id.editName);
         btnToogle = (Button)findViewById(R.id.btnToggle);
         btnDeleteUser = (Button)findViewById(R.id.btnDeleteUser);
-
-
+        list = (ListView)findViewById(R.id.list_of_messages);
 
 
         btnDeleteUser.setOnClickListener(new View.OnClickListener() {
@@ -193,14 +193,10 @@ public class MainActivity extends AppCompatActivity
         displayNavBG();
 
         displayChatMessages();
+
         Resources res = getResources();
-        list = (ListView)findViewById(R.id.list_of_messages);
-
-
-        adapter = new MyMessageAdapter(mainActivity, listOfMessages, res);
+        adapter = new MyMessageAdapter(mainActivity, listOfMessages, res, getUserUID());
         list.setAdapter(adapter);
-
-
 
         // backup
         listener = editName.getKeyListener();
@@ -224,6 +220,7 @@ public class MainActivity extends AppCompatActivity
                 changeAvatar();
             }
         });
+
 
     }
 
@@ -598,6 +595,7 @@ public class MainActivity extends AppCompatActivity
                                 msg.setMessageUser(document.getString("messageUser"));
                                 msg.setMessageText(document.getString("messageText"));
                                 msg.setMessageTime(document.getLong("messageTime"));
+                                msg.setMessageUID(document.getString("messageUID"));
 
                                 listOfMessages.add(msg);
 

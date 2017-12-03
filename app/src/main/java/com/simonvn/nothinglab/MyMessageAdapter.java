@@ -3,6 +3,7 @@ package com.simonvn.nothinglab;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
+import android.support.v7.widget.CardView;
 import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,6 +12,7 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 /********* Adapter class extends with BaseAdapter and implements with OnClickListener ************/
 public class MyMessageAdapter extends BaseAdapter   implements View.OnClickListener {
@@ -20,16 +22,18 @@ public class MyMessageAdapter extends BaseAdapter   implements View.OnClickListe
          private ArrayList data;
          private static LayoutInflater inflater=null;
          public Resources res;
+         public String nUID;
          ChatMessage tempValues=null;
          int i=0;
           
          /*************  CustomAdapter Constructor *****************/
-         public MyMessageAdapter(Activity a, ArrayList d, Resources resLocal) {
+         public MyMessageAdapter(Activity a, ArrayList d, Resources resLocal, String n) {
               
                 /********** Take passed values **********/
                  activity = a;
                  data = d;
                  res = resLocal;
+                 nUID = n;
               
                  /***********  Layout inflator to call external xml layout () ***********/
                   inflater = (LayoutInflater)activity.
@@ -59,6 +63,7 @@ public class MyMessageAdapter extends BaseAdapter   implements View.OnClickListe
              public TextView messageText; //text;
              public TextView messageUser; //text1;
              public TextView messageTime; //textWide;
+             public CardView messageBG;
       
          }
       
@@ -79,6 +84,7 @@ public class MyMessageAdapter extends BaseAdapter   implements View.OnClickListe
                  holder.messageText = (TextView) vi.findViewById(R.id.message_text);
                  holder.messageUser=(TextView)vi.findViewById(R.id.message_user);
                  holder.messageTime=(TextView)vi.findViewById(R.id.message_time);
+                 holder.messageBG=(CardView) vi.findViewById(R.id.message_card);
                   
                 /************  Set holder with LayoutInflater ************/
                  vi.setTag( holder );
@@ -104,6 +110,13 @@ public class MyMessageAdapter extends BaseAdapter   implements View.OnClickListe
 
                  holder.messageText.setText(tempValues.getMessageText());
                  holder.messageUser.setText(tempValues.getMessageUser());
+                 holder.messageUser.setHint(tempValues.getMessageUID());
+                 if (Objects.equals(nUID, tempValues.getMessageUID())) {
+                     holder.messageUser.setTextColor(holder.messageBG.getContext().getResources().getColor(R.color.colorWhite));
+                     holder.messageText.setTextColor(holder.messageBG.getContext().getResources().getColor(R.color.colorWhite));
+                     holder.messageTime.setTextColor(holder.messageBG.getContext().getResources().getColor(R.color.colorWhite));
+                     holder.messageBG.setCardBackgroundColor(holder.messageBG.getContext().getResources().getColor(R.color.colorAccent));
+                 }
                  holder.messageTime.setText(DateFormat.format("dd-MM-yyyy (HH:mm:ss)",
                          tempValues.getMessageTime()));
 
