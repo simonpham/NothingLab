@@ -75,6 +75,7 @@ dependencies {
     compile 'com.google.firebase:firebase-messaging:11.6.0'
     compile 'com.firebase:firebase-jobdispatcher:0.6.0'
     compile 'de.hdodenhof:circleimageview:2.2.0'
+    compile 'com.firebaseui:firebase-ui:2.0.1'
 }
 
 apply plugin: 'com.google.gms.google-services'

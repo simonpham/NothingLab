@@ -1,6 +1,8 @@
 package com.simonvn.nothinglab;
 
 import android.content.Intent;
+import android.content.res.Resources;
+import android.database.DataSetObserver;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
@@ -9,6 +11,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
@@ -17,34 +20,51 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.text.format.DateFormat;
 import android.text.method.KeyListener;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.ListAdapter;
+import android.widget.ListView;
 import android.widget.RelativeLayout;
+import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.firebase.ui.auth.AuthUI;
+import com.firebase.ui.database.FirebaseListAdapter;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -67,6 +87,12 @@ public class MainActivity extends AppCompatActivity
     private KeyListener listener;
     private Drawable bgName;
 
+    ListView list;
+    MyMessageAdapter adapter;
+    public MainActivity mainActivity = this;
+    public ArrayList<ChatMessage> listOfMessages = new ArrayList<ChatMessage>();
+
+
     private boolean isAllowed = true;
     FirebaseFirestore db = FirebaseFirestore.getInstance();
     FirebaseStorage storage = FirebaseStorage.getInstance();
@@ -83,17 +109,41 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        /*
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        mainActivity = this;
+
+        // send button
+        FloatingActionButton fab =
+                (FloatingActionButton)findViewById(R.id.fab);
+
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                EditText input = (EditText)findViewById(R.id.input);
+                if (!Objects.equals(input.getText().toString().trim(), "")) {
+
+                    // Read the input field and push a new instance
+                    // of ChatMessage to the Firebase database
+
+                    db.collection("messages")
+                            .add(new ChatMessage(input.getText().toString(), nickname.getText().toString()))
+                            .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                                @Override
+                                public void onSuccess(DocumentReference documentReference) {
+
+                                }
+                            })
+                            .addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+
+                                }
+                            });
+
+                    // Clear the input
+                    input.setText("");
+                }
             }
         });
-        fab.setVisibility(View.GONE);
-        */
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -122,6 +172,8 @@ public class MainActivity extends AppCompatActivity
         btnDeleteUser = (Button)findViewById(R.id.btnDeleteUser);
 
 
+
+
         btnDeleteUser.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -139,6 +191,16 @@ public class MainActivity extends AppCompatActivity
         displayLoginUserProfileName();
         displayUserAvatar(getAvatarPath());
         displayNavBG();
+
+        displayChatMessages();
+        Resources res = getResources();
+        list = (ListView)findViewById(R.id.list_of_messages);
+
+
+        adapter = new MyMessageAdapter(mainActivity, listOfMessages, res);
+        list.setAdapter(adapter);
+
+
 
         // backup
         listener = editName.getKeyListener();
@@ -523,5 +585,49 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    private void displayChatMessages() {
+        db.collection("messages")
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (DocumentSnapshot document : task.getResult()) {
+                                ChatMessage msg = new ChatMessage();
 
+                                msg.setMessageUser(document.getString("messageUser"));
+                                msg.setMessageText(document.getString("messageText"));
+                                msg.setMessageTime(document.getLong("messageTime"));
+
+                                listOfMessages.add(msg);
+
+                                Collections.sort(listOfMessages, new Comparator<ChatMessage>() {
+                                    public int compare(ChatMessage o1, ChatMessage o2) {
+
+                                        //DateFormat.format("dd-MM-yyyy (HH:mm:ss)" o1.getMessageTime()
+                                        //SimpleDateFormat sf = new SimpleDateFormat("yyyy-MM-dd"); o2.getMessageTime()
+                                        //Date date = new Date(Long.parseLong(str));
+                                        // DateFormat.format("dd-MM-yyyy (HH:mm:ss)",o2.getMessageTime())
+
+                                        String datetime1 = DateFormat.format("yyyyMMddHHmmss",o1.getMessageTime()).toString() ;
+                                        String datetime2 = DateFormat.format("yyyyMMddHHmmss",o2.getMessageTime()).toString() ;
+                                        return datetime1.compareTo(datetime2);
+                                    }
+                                });
+
+                            }
+                        } else {
+                            //Log.d(TAG, "Error getting documents: ", task.getException());
+                        }
+                    }
+                });
+    }
+
+    public void onItemClick(int mPosition)
+    {
+        ChatMessage tempValues = ( ChatMessage ) listOfMessages.get(mPosition);
+
+    }
+
+    // method
 }
