@@ -359,8 +359,8 @@ public class MainActivity extends AppCompatActivity
                                 }
                             }
                         } else {
-                            nickname.setText("get failed with " + task.getException());
-                            editName.setText("get failed with " + task.getException());
+                            nickname.setText(profileName.getText().toString());
+                            editName.setText(profileName.getText().toString());
                         }
                     }
                 });
