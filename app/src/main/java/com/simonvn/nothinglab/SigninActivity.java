@@ -20,7 +20,6 @@ import java.util.List;
 public class SigninActivity extends AppCompatActivity {
 
     // initializing variables
-    private static final String TAG = SigninActivity.class.getSimpleName();
     private static final String PATH_TOS = "";
     private Button btnELogin;
     private Button btnGLogin;
